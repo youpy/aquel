@@ -22,6 +22,9 @@ module Aql
       context.execute!
 
       items = []
+      attributes = {}
+
+      walk(@ast['SELECT']['whereClause'], attributes)
       document = context.document_block.call(attributes)
 
       if context.items_block
@@ -58,26 +61,17 @@ module Aql
       end
     end
 
-    def attributes
-      result = {}
-      where = @ast['SELECT']['whereClause']
-
-      if where['AEXPR AND']
-        k = where['AEXPR AND']['lexpr']['AEXPR']['lexpr']['COLUMNREF']['fields'][0]
-        v = where['AEXPR AND']['lexpr']['AEXPR']['rexpr']['COLUMNREF']['fields'][0]
-        result[k] = v
-
-        k = where['AEXPR AND']['rexpr']['AEXPR']['lexpr']['COLUMNREF']['fields'][0]
-        v = where['AEXPR AND']['rexpr']['AEXPR']['rexpr']['COLUMNREF']['fields'][0]
-        result[k] = v
-      else
-        k = where['AEXPR']['lexpr']['COLUMNREF']['fields'][0]
-        v = where['AEXPR']['rexpr']['A_CONST']['val']
-
-        result[k] = v
+    def walk(aexpr, attributes)
+      if aexpr['AEXPR']
+        k = aexpr['AEXPR']['lexpr']['COLUMNREF']['fields'][0]
+        v = aexpr['AEXPR']['rexpr']['A_CONST']['val']
+        attributes[k] = v
+      elsif aexpr['AEXPR AND']
+        walk(aexpr['AEXPR AND']['lexpr'], attributes)
+        walk(aexpr['AEXPR AND']['rexpr'], attributes)
+      elsif aexpr['AEXPR OR']
+        raise 'OR clauses are not supported yet'
       end
-
-      result
     end
 
     def parser
