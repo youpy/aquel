@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Aquel::VERSION
   spec.authors       = ["youpy"]
   spec.email         = ["youpy@buycheapviagraonlinenow.com"]
-  spec.summary       = %q{A(nything) Q(uery) L(anguage)}
+  spec.summary       = %q{a(nything) que(ry) l(anguage)}
   spec.homepage      = ""
   spec.license       = "MIT"
 
