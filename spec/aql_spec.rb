@@ -91,7 +91,7 @@ describe Aql do
 
       context 'simple query' do
         it 'finds matching line' do
-          items = aql.execute("select * from html where path = '#{html_path}' and css = \"div.foo\"")
+          items = aql.execute("select * from html where path = \"#{html_path}\" and css = \"div.foo\"")
 
           expect(items.size).to eql(2)
           expect(items.first).to eql('a')

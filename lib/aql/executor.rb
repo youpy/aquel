@@ -1,4 +1,4 @@
-require 'sql-parser'
+require 'pg_query'
 
 module Aql
   class Executor
@@ -15,8 +15,8 @@ module Aql
     end
 
     def execute(sql)
-      @ast = parser.scan_str(sql)
-      type = @ast.query_expression.table_expression.from_clause.tables.first.name
+      @ast = parser.parse(sql).parsetree.first
+      type = @ast['SELECT']['fromClause'][0]['RANGEVAR']['relname']
 
       context = @contexts[type]
       context.execute!
@@ -43,14 +43,14 @@ module Aql
       items.map do |item|
         result = []
 
-        if @ast.query_expression.list.kind_of?(SQLParser::Statement::All)
-          result = item
-        else
-          @ast.query_expression.list.columns.each do |select|
-            case select.value
-            when Fixnum
-              result << item[select.value.to_i-1]
-            end
+        @ast['SELECT']['targetList'].each do |target|
+          val = target['RESTARGET']['val']
+
+          case
+          when val['COLUMNREF']
+            result = item
+          when val['A_CONST']
+            result << item[val['A_CONST']['val']-1]
           end
         end
 
@@ -60,20 +60,28 @@ module Aql
 
     def attributes
       result = {}
-      search_condition = @ast.query_expression.table_expression.where_clause.search_condition
+      where = @ast['SELECT']['whereClause']
 
-      if search_condition.kind_of?(SQLParser::Statement::And)
-        result[search_condition.left.left.name] = search_condition.left.right.value
-        result[search_condition.right.left.name] = search_condition.right.right.value
+      if where['AEXPR AND']
+        k = where['AEXPR AND']['lexpr']['AEXPR']['lexpr']['COLUMNREF']['fields'][0]
+        v = where['AEXPR AND']['lexpr']['AEXPR']['rexpr']['COLUMNREF']['fields'][0]
+        result[k] = v
+
+        k = where['AEXPR AND']['rexpr']['AEXPR']['lexpr']['COLUMNREF']['fields'][0]
+        v = where['AEXPR AND']['rexpr']['AEXPR']['rexpr']['COLUMNREF']['fields'][0]
+        result[k] = v
       else
-        result[search_condition.left.name] = search_condition.right.value
+        k = where['AEXPR']['lexpr']['COLUMNREF']['fields'][0]
+        v = where['AEXPR']['rexpr']['A_CONST']['val']
+
+        result[k] = v
       end
 
       result
     end
 
     def parser
-      @parser ||= SQLParser::Parser.new
+      @parser ||= PgQuery
     end
   end
 end
