@@ -53,11 +53,7 @@ module Aquel
       attributes.each do |k, v|
         if k.kind_of?(Fixnum)
           items = items.find_all do |item|
-            if v[:name] == '='
-              item[k-1] == v[:value]
-            elsif v[:name] == '<>'
-              item[k-1] != v[:value]
-            end
+            v.operate(item[k-1])
           end
         end
       end
@@ -88,7 +84,7 @@ module Aquel
       if aexpr = node['AEXPR']
         k = expr_value(aexpr['lexpr'])
         v = expr_value(aexpr['rexpr'])
-        attributes[k] = { :value => v, :name => aexpr['name'][0] }
+        attributes[k] = Attribute.new(:value => v, :name => aexpr['name'][0])
       elsif aexpr = node['AEXPR AND']
         walk(aexpr['lexpr'], attributes)
         walk(aexpr['rexpr'], attributes)
