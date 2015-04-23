@@ -18,39 +18,14 @@ module Aquel
       ast = parser.parse(sql).parsetree.first
       type = ast['SELECT']['fromClause'][0]['RANGEVAR']['relname']
 
-      context = @contexts[type]
-      context.execute!
-
       items = []
       attributes = Attributes.new
 
       walk(ast['SELECT']['whereClause'], attributes)
-      document = context.document_block.call(attributes.equal_values)
-
-      if context.items_block
-        context.items_block.call(document).each do |item|
-          value = context.split_block.call(item)
-          items << (value.kind_of?(Array) ? value : [value])
-        end
-      elsif context.find_by_block.size > 0
-        context.find_by_block.each do |k, v|
-          v.call(attributes.equal_values[k], document).each do |item|
-            value = context.split_block.call(item)
-            items << (value.kind_of?(Array) ? value : [value])
-          end
-        end
-      else
-        while item = context.item_block.call(document)
-          items << context.split_block.call(item)
-        end
-      end
-
+      context = @contexts[type]
+      items = context.execute(attributes)
       items = filter(items, attributes)
       items = colum_filter(items, ast['SELECT']['targetList'])
-    ensure
-      if document.respond_to?(:close)
-        document.close
-      end
     end
 
     def filter(items, attributes)
