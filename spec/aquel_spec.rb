@@ -2,14 +2,14 @@ require File.dirname(__FILE__) + '/spec_helper'
 
 require 'nokogiri'
 
-describe Aql do
+describe Aquel do
   describe 'TSV parser' do
     let(:tsv_path) {
       File.dirname(__FILE__) + '/test.tsv'
     }
 
-    let(:aql) {
-      Aql.define 'tsv' do
+    let(:aquel) {
+      Aquel.define 'tsv' do
         document do |attributes|
           open(attributes['path'])
         end
@@ -27,12 +27,12 @@ describe Aql do
     context 'simple query' do
       it 'finds matching line' do
         # TODO: support prepared statement
-        items = aql.execute("select * from tsv where path = '#{tsv_path}'")
+        items = aquel.execute("select * from tsv where path = '#{tsv_path}'")
 
         expect(items.size).to eql(2)
         expect(items.first).to eql(%w/foo1 bar1 baz1/)
 
-        items = aql.execute("select 1,3 from tsv where path = '#{tsv_path}'")
+        items = aquel.execute("select 1,3 from tsv where path = '#{tsv_path}'")
 
         expect(items.size).to eql(2)
         expect(items.first).to eql(%w/foo1 baz1/)
@@ -42,12 +42,12 @@ describe Aql do
     context 'filter query' do
       it 'finds matching line' do
         # TODO: support prepared statement
-        items = aql.execute("select * from tsv where path = '#{tsv_path}' and 1 = 'foo2'")
+        items = aquel.execute("select * from tsv where path = '#{tsv_path}' and 1 = 'foo2'")
 
         expect(items.size).to eql(1)
         expect(items.first).to eql(%w/foo2 bar2 baz2/)
 
-        items = aql.execute("select 1,3 from tsv where path = '#{tsv_path}' and 1 = 'foo1'")
+        items = aquel.execute("select 1,3 from tsv where path = '#{tsv_path}' and 1 = 'foo1'")
 
         expect(items.size).to eql(1)
         expect(items.first).to eql(%w/foo1 baz1/)
@@ -61,8 +61,8 @@ describe Aql do
     }
 
     context 'items' do
-      let(:aql) {
-        Aql.define 'html' do
+      let(:aquel) {
+        Aquel.define 'html' do
           document do |attributes|
             Nokogiri::HTML(open(attributes['path']))
           end
@@ -79,7 +79,7 @@ describe Aql do
 
       context 'simple query' do
         it 'finds matching line' do
-          items = aql.execute("select * from html where path = '#{html_path}'")
+          items = aquel.execute("select * from html where path = '#{html_path}'")
 
           expect(items.size).to eql(2)
           expect(items.first).to eql(['a'])
@@ -88,8 +88,8 @@ describe Aql do
     end
 
     context 'find_by' do
-      let(:aql) {
-        Aql.define 'html' do
+      let(:aquel) {
+        Aquel.define 'html' do
           document do |attributes|
             Nokogiri::HTML(open(attributes['path']))
           end
@@ -106,7 +106,7 @@ describe Aql do
 
       context 'simple query' do
         it 'finds matching line' do
-          items = aql.execute("select * from html where path = '#{html_path}' and css = 'div.foo'")
+          items = aquel.execute("select * from html where path = '#{html_path}' and css = 'div.foo'")
 
           expect(items.size).to eql(2)
           expect(items.first).to eql(['a'])

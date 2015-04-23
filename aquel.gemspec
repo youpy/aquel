@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'aql/version'
+require 'aquel/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "aql"
-  spec.version       = Aql::VERSION
+  spec.name          = "aquel"
+  spec.version       = Aquel::VERSION
   spec.authors       = ["youpy"]
   spec.email         = ["youpy@buycheapviagraonlinenow.com"]
   spec.summary       = %q{A(nything) Q(uery) L(anguage)}

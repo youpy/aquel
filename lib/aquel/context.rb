@@ -1,4 +1,4 @@
-module Aql
+module Aquel
   class Context
     attr_reader :document_block, :item_block, :items_block, :split_block, :find_by_block
 

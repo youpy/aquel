@@ -1,6 +1,6 @@
 require 'pg_query'
 
-module Aql
+module Aquel
   class Executor
     attr_reader :context
 

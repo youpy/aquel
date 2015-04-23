@@ -1,3 +1,3 @@
-module Aql
+module Aquel
   VERSION = "0.0.1"
 end

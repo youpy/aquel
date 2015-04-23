@@ -1,8 +1,8 @@
-require "aql/context"
-require "aql/executor"
-require "aql/version"
+require "aquel/context"
+require "aquel/executor"
+require "aquel/version"
 
-module Aql
+module Aquel
   def define(name, &block)
     Executor.new.define(name, &block)
   end
