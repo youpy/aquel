@@ -1,4 +1,4 @@
-# aquel
+# aquel [![Build Status](https://travis-ci.org/youpy/aquel.svg)](https://travis-ci.org/youpy/aquel)
 
 **a**(nything) **que**(ry) **l**(anguage)
 
