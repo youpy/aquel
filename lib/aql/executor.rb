@@ -29,12 +29,14 @@ module Aql
 
       if context.items_block
         context.items_block.call(document).each do |item|
-          items << context.split_block.call(item)
+          value = context.split_block.call(item)
+          items << (value.kind_of?(Array) ? value : [value])
         end
       elsif context.find_by_block.size > 0
         context.find_by_block.each do |k, v|
           v.call(attributes[k], document).each do |item|
-            items << context.split_block.call(item)
+            value = context.split_block.call(item)
+            items << (value.kind_of?(Array) ? value : [value])
           end
         end
       else
