@@ -22,10 +22,10 @@ module Aquel
       context.execute!
 
       items = []
-      attributes = {}
+      attributes = Attributes.new
 
       walk(ast['SELECT']['whereClause'], attributes)
-      document = context.document_block.call(attributes)
+      document = context.document_block.call(attributes.equal_values)
 
       if context.items_block
         context.items_block.call(document).each do |item|
@@ -34,7 +34,7 @@ module Aquel
         end
       elsif context.find_by_block.size > 0
         context.find_by_block.each do |k, v|
-          v.call(attributes[k], document).each do |item|
+          v.call(attributes.equal_values[k], document).each do |item|
             value = context.split_block.call(item)
             items << (value.kind_of?(Array) ? value : [value])
           end
@@ -53,7 +53,11 @@ module Aquel
       attributes.each do |k, v|
         if k.kind_of?(Fixnum)
           items = items.find_all do |item|
-            item[k-1] == v
+            if v[:name] == '='
+              item[k-1] == v[:value]
+            elsif v[:name] == '<>'
+              item[k-1] != v[:value]
+            end
           end
         end
       end
@@ -80,14 +84,14 @@ module Aquel
       end
     end
 
-    def walk(aexpr, attributes)
-      if aexpr['AEXPR']
-        k = expr_value(aexpr['AEXPR']['lexpr'])
-        v = expr_value(aexpr['AEXPR']['rexpr'])
-        attributes[k] = v
-      elsif aexpr['AEXPR AND']
-        walk(aexpr['AEXPR AND']['lexpr'], attributes)
-        walk(aexpr['AEXPR AND']['rexpr'], attributes)
+    def walk(node, attributes)
+      if aexpr = node['AEXPR']
+        k = expr_value(aexpr['lexpr'])
+        v = expr_value(aexpr['rexpr'])
+        attributes[k] = { :value => v, :name => aexpr['name'][0] }
+      elsif aexpr = node['AEXPR AND']
+        walk(aexpr['lexpr'], attributes)
+        walk(aexpr['rexpr'], attributes)
       elsif aexpr['AEXPR OR']
         raise 'OR clauses are not supported yet'
       end

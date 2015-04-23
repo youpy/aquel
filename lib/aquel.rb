@@ -1,3 +1,4 @@
+require "aquel/attributes"
 require "aquel/context"
 require "aquel/executor"
 require "aquel/version"

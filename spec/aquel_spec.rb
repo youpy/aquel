@@ -51,6 +51,11 @@ describe Aquel do
 
         expect(items.size).to eql(1)
         expect(items.first).to eql(%w/foo1 baz1/)
+
+        items = aquel.execute("select 1,3 from tsv where path = '#{tsv_path}' and 1 != 'foo1'")
+
+        expect(items.size).to eql(1)
+        expect(items.first).to eql(%w/foo2 baz2/)
       end
     end
   end
