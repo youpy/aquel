@@ -35,7 +35,7 @@ aql = Aql.define 'tsv' do
   end
 end
 
-items = aql.execute("select * from tsv where path = '/path/to/file.tsv'")
+items = aql.execute("select 1,3 from tsv where path = '/path/to/file.tsv'")
 ```
 
 ```ruby
@@ -55,7 +55,7 @@ aql = Aql.define 'html' do
   end
 end
 
-items = aql.execute("select 1,3 from html where url = 'http://example.com/foo' and css = 'div.bar'")
+items = aql.execute("select * from html where url = 'http://example.com/foo' and css = 'div.bar'")
 ```
 
 ## Contributing
