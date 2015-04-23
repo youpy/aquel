@@ -1,6 +1,6 @@
 # aquel
 
-A(nything) Q(uery) L(anguage)
+a(nything) que(ry) l(anguage)
 
 ## Installation
 
