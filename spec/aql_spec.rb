@@ -9,7 +9,7 @@ describe Aql do
     }
 
     let(:aql) {
-      aql = Aql.define 'tsv' do
+      Aql.define 'tsv' do
         document do |attributes|
           open(attributes['path'])
         end
@@ -62,7 +62,7 @@ describe Aql do
 
     context 'items' do
       let(:aql) {
-        aql = Aql.define 'html' do
+        Aql.define 'html' do
           document do |attributes|
             Nokogiri::HTML(open(attributes['path']))
           end
@@ -89,7 +89,7 @@ describe Aql do
 
     context 'find_by' do
       let(:aql) {
-        aql = Aql.define 'html' do
+        Aql.define 'html' do
           document do |attributes|
             Nokogiri::HTML(open(attributes['path']))
           end
