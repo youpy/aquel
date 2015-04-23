@@ -47,6 +47,10 @@ module Aquel
 
       items = filter(items, attributes)
       items = colum_filter(items, ast['SELECT']['targetList'])
+    ensure
+      if document.respond_to?(:close)
+        document.close
+      end
     end
 
     def filter(items, attributes)
