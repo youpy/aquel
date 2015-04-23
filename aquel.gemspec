@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["youpy"]
   spec.email         = ["youpy@buycheapviagraonlinenow.com"]
   spec.summary       = %q{a(nything) que(ry) l(anguage)}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/youpy/aquel"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
