@@ -15,8 +15,8 @@ module Aql
     end
 
     def execute(sql)
-      @ast = parser.parse(sql).parsetree.first
-      type = @ast['SELECT']['fromClause'][0]['RANGEVAR']['relname']
+      ast = parser.parse(sql).parsetree.first
+      type = ast['SELECT']['fromClause'][0]['RANGEVAR']['relname']
 
       context = @contexts[type]
       context.execute!
@@ -24,7 +24,7 @@ module Aql
       items = []
       attributes = {}
 
-      walk(@ast['SELECT']['whereClause'], attributes)
+      walk(ast['SELECT']['whereClause'], attributes)
       document = context.document_block.call(attributes)
 
       if context.items_block
@@ -46,7 +46,7 @@ module Aql
       end
 
       items = filter(items, attributes)
-      items = colum_filter(items, @ast['SELECT']['targetList'])
+      items = colum_filter(items, ast['SELECT']['targetList'])
     end
 
     def filter(items, attributes)
