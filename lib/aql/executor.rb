@@ -43,17 +43,34 @@ module Aql
         end
       end
 
+      items = filter(items, attributes)
+      items = colum_filter(items, @ast['SELECT']['targetList'])
+    end
+
+    def filter(items, attributes)
+      attributes.each do |k, v|
+        if k.kind_of?(Fixnum)
+          items = items.find_all do |item|
+            item[k-1] == v
+          end
+        end
+      end
+
+      items
+    end
+
+    def colum_filter(items, target_list)
       items.map do |item|
         result = []
 
-        @ast['SELECT']['targetList'].each do |target|
-          val = target['RESTARGET']['val']
+        target_list.each do |target|
+          val = expr_value(target['RESTARGET']['val'])
 
-          case
-          when val['COLUMNREF']
+          case val
+          when {"A_STAR"=>{}}
             result = item
-          when val['A_CONST']
-            result << item[val['A_CONST']['val']-1]
+          when Fixnum
+            result << item[val-1]
           end
         end
 
@@ -63,14 +80,22 @@ module Aql
 
     def walk(aexpr, attributes)
       if aexpr['AEXPR']
-        k = aexpr['AEXPR']['lexpr']['COLUMNREF']['fields'][0]
-        v = aexpr['AEXPR']['rexpr']['A_CONST']['val']
+        k = expr_value(aexpr['AEXPR']['lexpr'])
+        v = expr_value(aexpr['AEXPR']['rexpr'])
         attributes[k] = v
       elsif aexpr['AEXPR AND']
         walk(aexpr['AEXPR AND']['lexpr'], attributes)
         walk(aexpr['AEXPR AND']['rexpr'], attributes)
       elsif aexpr['AEXPR OR']
         raise 'OR clauses are not supported yet'
+      end
+    end
+
+    def expr_value(expr)
+      if expr['COLUMNREF']
+        expr['COLUMNREF']['fields'][0]
+      elsif expr['A_CONST']
+        expr['A_CONST']['val']
       end
     end
 

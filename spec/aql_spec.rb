@@ -38,6 +38,21 @@ describe Aql do
         expect(items.first).to eql(%w/foo1 baz1/)
       end
     end
+
+    context 'filter query' do
+      it 'finds matching line' do
+        # TODO: support prepared statement
+        items = aql.execute("select * from tsv where path = '#{tsv_path}' and 1 = 'foo2'")
+
+        expect(items.size).to eql(1)
+        expect(items.first).to eql(%w/foo2 bar2 baz2/)
+
+        items = aql.execute("select 1,3 from tsv where path = '#{tsv_path}' and 1 = 'foo1'")
+
+        expect(items.size).to eql(1)
+        expect(items.first).to eql(%w/foo1 baz1/)
+      end
+    end
   end
 
   describe 'HTML parser' do
