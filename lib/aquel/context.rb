@@ -5,6 +5,7 @@ module Aquel
     def initialize(block)
       @block = block
       @find_by_block = {}
+      @header = false
     end
 
     def execute(attributes)
@@ -31,7 +32,17 @@ module Aquel
         end
       end
 
-      items
+      if @header
+        header = items.shift.map(&:downcase)
+      else
+        header = (1..(items.first.size)).to_a
+      end
+
+      items.map do |itm|
+        item = {}
+        itm.each_with_index { |v, i| item[header[i]] = v }
+        item
+      end
     ensure
       if document.respond_to?(:close)
         document.close
@@ -56,6 +67,10 @@ module Aquel
 
     def find_by(name, &block)
       @find_by_block[name] = block
+    end
+
+    def has_header
+      @header = true
     end
   end
 end

@@ -30,9 +30,18 @@ module Aquel
 
     def filter(items, attributes)
       attributes.each do |k, v|
-        if k.kind_of?(Fixnum)
+        case k
+        when Fixnum
           items = items.find_all do |item|
-            v.operate(item[k-1])
+            v.operate(item[k])
+          end
+        when String
+          items = items.find_all do |item|
+            if item[k]
+              v.operate(item[k])
+            else
+              true
+            end
           end
         end
       end
@@ -42,7 +51,7 @@ module Aquel
 
     def colum_filter(items, target_list)
       items.map do |item|
-        result = []
+        result = {}
 
         target_list.each do |target|
           val = expr_value(target['RESTARGET']['val'])
@@ -51,7 +60,9 @@ module Aquel
           when {"A_STAR"=>{}}
             result = item
           when Fixnum
-            result << item[val-1]
+            result[val] = item[val]
+          when String
+            result[val] = item[val]
           end
         end
 

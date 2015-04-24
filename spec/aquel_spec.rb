@@ -10,6 +10,8 @@ describe Aquel do
 
     let(:aquel) {
       Aquel.define 'tsv' do
+        has_header
+
         document do |attributes|
           open(attributes['path'])
         end
@@ -30,32 +32,32 @@ describe Aquel do
         items = aquel.execute("select * from tsv where path = '#{tsv_path}'")
 
         expect(items.size).to eql(2)
-        expect(items.first).to eql(%w/foo1 bar1 baz1/)
+        expect(items.first).to eql({"col1"=>"foo1", "col2"=>"bar1", "col3"=>"baz1"})
 
-        items = aquel.execute("select 1,3 from tsv where path = '#{tsv_path}'")
+        items = aquel.execute("select COL1,col3 from tsv where path = '#{tsv_path}'")
 
         expect(items.size).to eql(2)
-        expect(items.first).to eql(%w/foo1 baz1/)
+        expect(items.first).to eql({"col1"=>"foo1", "col3"=>"baz1"})
       end
     end
 
     context 'filter query' do
       it 'finds matching line' do
         # TODO: support prepared statement
-        items = aquel.execute("select * from tsv where path = '#{tsv_path}' and 1 = 'foo2'")
+        items = aquel.execute("select * from tsv where path = '#{tsv_path}' and col1 = 'foo2'")
 
         expect(items.size).to eql(1)
-        expect(items.first).to eql(%w/foo2 bar2 baz2/)
+        expect(items.first).to eql({"col1"=>"foo2", "col2"=>"bar2", "col3"=>"baz2"})
 
-        items = aquel.execute("select 1,3 from tsv where path = '#{tsv_path}' and 1 = 'foo1'")
-
-        expect(items.size).to eql(1)
-        expect(items.first).to eql(%w/foo1 baz1/)
-
-        items = aquel.execute("select 1,3 from tsv where path = '#{tsv_path}' and 1 != 'foo1'")
+        items = aquel.execute("select col1,col3 from tsv where path = '#{tsv_path}' and col1 = 'foo1'")
 
         expect(items.size).to eql(1)
-        expect(items.first).to eql(%w/foo2 baz2/)
+        expect(items.first).to eql({"col1"=>"foo1", "col3"=>"baz1"})
+
+        items = aquel.execute("select col1,COL3 from tsv where path = '#{tsv_path}' and col1 != 'foo1'")
+
+        expect(items.size).to eql(1)
+        expect(items.first).to eql({"col1"=>"foo2", "col3"=>"baz2"})
       end
     end
   end
@@ -87,7 +89,7 @@ describe Aquel do
           items = aquel.execute("select * from html where path = '#{html_path}'")
 
           expect(items.size).to eql(2)
-          expect(items.first).to eql(['a'])
+          expect(items.first).to eql({1 => 'a'})
         end
       end
     end
@@ -114,7 +116,7 @@ describe Aquel do
           items = aquel.execute("select * from html where path = '#{html_path}' and css = 'div.foo'")
 
           expect(items.size).to eql(2)
-          expect(items.first).to eql(['a'])
+          expect(items.first).to eql({1 => 'a'})
         end
       end
     end
